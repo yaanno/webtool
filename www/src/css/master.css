@@ -1,0 +1,50 @@
+/* General Styles */
+
+body{
+    font-family: default_font_family;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: default_heading_font_family;
+}
+
+a,a:link,a:visited{
+    color: default_general_link_color;
+    text-decoration: default_text_decoration;
+}
+
+a:hover{
+    color: default_general_link_hover_color;
+    text-decoration: default_text_hover_decoration;
+}
+
+/* Object Styles  */
+
+.panel{
+    width: default_panel_width;
+    background: default_panel_background_color;
+    padding: default_panel_padding;
+}
+
+.panel-title{
+    text-transform: uppercase;
+}
+
+.panel-content{
+    font-style: italic;
+}
+
+/* Site Specific Styles */
+
+#sitename-branding{
+    margin: 20px auto 0;
+}
+
+h2.sitename{
+    font-family: "Trebuchet-MS", Helvetica, Arial, sans-serif;
+}
+
+#sitename-branding a{
+    color: #f63;
+}
+

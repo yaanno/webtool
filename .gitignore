@@ -1,0 +1,5 @@
+# exclude stuff unnecessary
+lib/ant/*
+*~
+www-lib/css/*
+www-lib/js/*

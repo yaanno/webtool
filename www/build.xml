@@ -1,0 +1,100 @@
+<project name="wireframing" default="default" basedir=".">
+
+  <target name="default" depends="loadprops">
+    <echo>Please specify build target!</echo>
+    <echo>Available options:</echo>
+    <echo>ant testing - builds all files to [${build.dir}] directory for overview</echo>
+    <echo>ant staging - builds all files to [${dist.dir}] directory for staging and production</echo>
+  </target>
+	
+  <target name="loadprops">
+    <echo>Load all properties</echo>
+    <property file="build.properties" />
+    <property file="site.properties" />
+  </target>
+
+  <target name="taskdefs" depends="loadprops">
+    <echo>Load all dependencies</echo>
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${acontrib.jar}"/>
+    <taskdef name="jsmin" classname="net.matthaynes.jsmin.JSMin_Task" classpath="${jsmin.jar}"/>
+    <path id="task.classpath">
+      <pathelement location="${yui.jar}" />
+	<pathelement location="${yui.task.jar}" />
+    </path>
+    <taskdef name="cssmin" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
+      <classpath refid="task.classpath" />
+    </taskdef>
+  </target>
+
+  <target name="preparedir" depends="taskdefs">
+    <echo>Preparing directories and files</echo>
+    <delete dir="${build.dir}" />
+    <copy todir="${build.dir}">
+      <fileset dir="${src.dir}" />
+    </copy>
+  </target>
+	
+  <target name="concat" depends="preparedir">
+    <echo>Concatenating JavaScript files</echo>
+    <concat destfile="${build.dir}/js/${tmp.js}">
+      <fileset dir="${js.fw.src.path}" includes="prototype-1.6.0.3.js" />
+      <fileset dir="${build.dir}/js" includes="master.js" />
+    </concat>
+    <echo>Concatenating CSS files</echo>
+    <concat destfile="${build.dir}/css/${tmp.css}">
+      <fileset dir="${css.fw.src.path}" includes="reset.css" />
+      <fileset dir="${css.fw.src.path}" includes="typography.css" />
+      <fileset dir="${css.fw.src.path}" includes="ie.css" />
+      <fileset dir="${build.dir}/css" includes="master.css" />
+    </concat>
+  </target>
+	
+  <target name="processing" depends="concat">
+    <echo>Processing all files in [${build.dir}]</echo>
+    <for param="file">
+      <fileset dir="${build.dir}" />
+      <sequential>
+	<echo>Processing file [@{file}]</echo>
+	<replace file="@{file}" replacefilterfile="site.properties" />
+      </sequential>
+    </for>
+    <echo>All files processed.</echo>
+  </target>
+	
+  <target name="compress-js" depends="processing">
+    <echo>Minifying JavaScript file</echo>
+    <jsmin destdir="${build.dir}/js" force="true" suffix="true">
+      <fileset dir="${build.dir}/js" includes="${tmp.js}"/>
+    </jsmin>
+  </target>
+	
+  <target name="compress-css" depends="processing">
+    <echo>Minifying CSS file</echo>
+    <cssmin fromdir="${build.dir}/css" todir="${build.dir}/css" cssSuffix=".min.css">
+      <include name="${tmp.css}" />
+    </cssmin>
+  </target>
+	
+  <target name="testing" depends="compress-js,compress-css">
+    <echo>Building everything to [${build.dir}] directory</echo>
+  </target>
+	
+  <target name="movetoprod">
+    <echo>Preparing production directories and files</echo>
+    <delete dir="${dist.dir}" />
+    <copy todir="${dist.dir}">
+      <fileset dir="${build.dir}" />
+    </copy>
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.dir}">
+      <exclude name="master.html"/>
+      <exclude name="**/${prod.js}"/>
+      <exclude name="**/${prod.css}"/>
+    </delete>
+  </target>
+	
+  <target name="staging" depends="testing,movetoprod">
+    <echo>Building everything for staging and production to [${dist.dir}] directory</echo>
+  </target>
+	
+</project>
