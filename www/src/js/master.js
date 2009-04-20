@@ -1,18 +1,18 @@
-var sitename = window.sitename || {};
+var SITENAME = window.SITENAME || {};
 
-sitename.config = {
-  branding: "sitename-branding",
-  tagline: "sitename-tagline"
+SITENAME.config = {
+  branding: "SITENAME-branding",
+  tagline: "SITENAME-tagline"
 };
 
-sitename.doSomething = function(){
-  var branding = $(sitename.config.branding);
-  var tagline = $(sitename.config.branding);
+SITENAME.doSomething = function(){
+  var branding = $(SITENAME.config.branding);
+  var tagline = $(SITENAME.config.branding);
   if(!branding || !tagline) return;
   // Doing something useful with these
 };
 
 window.onload = function(){
-  if(!sitename.config) return;
-  sitename.doSomething();
+  if(!SITENAME.config) return;
+  SITENAME.doSomething();
 };

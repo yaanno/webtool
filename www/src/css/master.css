@@ -1,29 +1,29 @@
 /* General Styles */
 
 body{
-    font-family: default_font_family;
+    font-family: DEFAULT_FONT_FAMILY;
 }
 
 h1,h2,h3,h4,h5,h6{
-    font-family: default_heading_font_family;
+    font-family: DEFAULT_HEADING_FONT_FAMILY;
 }
 
 a,a:link,a:visited{
-    color: default_general_link_color;
-    text-decoration: default_text_decoration;
+    color: DEFAULT_GENERAL_LINK_COLOR;
+    text-decoration: DEFAULT_TEXT_DECORATION;
 }
 
 a:hover{
-    color: default_general_link_hover_color;
-    text-decoration: default_text_hover_decoration;
+    color: DEFAULT_GENERAL_LINK_HOVER_COLOR;
+    text-decoration: DEFAULT_TEXT_HOVER_DECORATION;
 }
 
 /* Object Styles  */
 
 .panel{
-    width: default_panel_width;
-    background: default_panel_background_color;
-    padding: default_panel_padding;
+    width: DEFAULT_PANEL_WIDTH;
+    background: DEFAULT_PANEL_BACKGROUND_COLOR;
+    padding: DEFAULT_PANEL_PADDING;
 }
 
 .panel-title{
@@ -36,15 +36,15 @@ a:hover{
 
 /* Site Specific Styles */
 
-#sitename-branding{
+#SITENAME-branding{
     margin: 20px auto 0;
 }
 
-h2.sitename{
+h2.SITENAME{
     font-family: "Trebuchet-MS", Helvetica, Arial, sans-serif;
 }
 
-#sitename-branding a{
+#SITENAME-branding a{
     color: #f63;
 }
 
