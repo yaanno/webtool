@@ -18,23 +18,46 @@ It is supposed to do the following (well, some day):
 * JSMin
 * YUI Compressor
 
+=== Why JSMin and YUI Compressor?
+
+You might ask why both? Using JSMin for compressing JavaScript is my
+personal taste (plus you may chose not to do the uglify job :P)
+
+== Dependencies
+
+* Some Java JDK
+* Apache Ant
+
+=== JDK
+
+I prefer SUN's Java SDK but the tool works well with other JDKs.
+
+=== Apache Ant
+
+Install it separately. It has other great tools bundled. See
+http://ant.apache.org Add Ant's bin directory to your PATH eg.
+
+export LIB_PATH="/home/janos/lib"
+export ANT_HOME="$LIB_PATH/ant"
+export PATH=$ANT_HOME:$PATH
+
 == On variables
 
 Variables are defined in property files for easy access. Site specific variables should work through all layers: HTML, CSS and JavaScript. For example you can set in site.properties:
 
-sitename=mysite
-default_heading_color=#333
+SITENAME=mysite
+DEFAULT_HEADING_COLOR=#333
 
 and use in your CSS:
 
-h3.sitename{
-  color: default_heading_color
-}
+    h3.SITENAME{
+     color: default_heading_color
+    }
 
 and in your JS:
 
-var tagline = $("sitename-tagline");
+    var tagline = $("SITENAME-tagline");
 
-and in you HTML of course:
+and in your HTML of course:
 
-<p class="sitename-tagline">A really cool example</p>
+    <p class="SITENAME-tagline">A really cool example</p>
