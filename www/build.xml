@@ -8,9 +8,11 @@
   </target>
 	
   <target name="loadprops">
+    <tstamp />
     <echo>Load all properties</echo>
     <property file="build.properties" />
     <property file="site.properties" />
+    <property file="version.properties" />
   </target>
 
   <target name="taskdefs" depends="loadprops">
@@ -54,6 +56,9 @@
 	<replace file="@{file}" replacefilterfile="site.properties" />
       </sequential>
     </for>
+    <echo>Setting CSS and JavaScript file versions (timestamp): ${DSTAMP}${TSTAMP}</echo>
+    <replace file="${build.dir}/master.html" token="CURRENT_CSS_VERSION" value="${DSTAMP}${TSTAMP}" />
+    <replace file="${build.dir}/master.html" token="CURRENT_JS_VERSION" value="${DSTAMP}${TSTAMP}" />
     <echo>All files processed.</echo>
   </target>
 	
