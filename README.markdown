@@ -35,11 +35,7 @@ I prefer SUN's Java SDK but the tool works well with other JDKs.
 ### Apache Ant
 
 Install it separately. It has other great tools bundled. See
-http://ant.apache.org Add Ant's bin directory to your PATH eg.
-
-    export LIB_PATH="/home/janos/lib"
-    export ANT_HOME="$LIB_PATH/ant"
-    export PATH=$ANT_HOME:$PATH
+http://ant.apache.org
 
 ## On variables
 

@@ -37,14 +37,10 @@
   <target name="concat" depends="preparedir">
     <echo>Concatenating JavaScript files</echo>
     <concat destfile="${build.dir}/js/${tmp.js}">
-      <fileset dir="${js.fw.src.path}" includes="prototype-1.6.0.3.js" />
       <fileset dir="${build.dir}/js" includes="master.js" />
     </concat>
     <echo>Concatenating CSS files</echo>
     <concat destfile="${build.dir}/css/${tmp.css}">
-      <fileset dir="${css.fw.src.path}" includes="reset.css" />
-      <fileset dir="${css.fw.src.path}" includes="typography.css" />
-      <fileset dir="${css.fw.src.path}" includes="ie.css" />
       <fileset dir="${build.dir}/css" includes="master.css" />
     </concat>
   </target>
