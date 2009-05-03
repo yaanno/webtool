@@ -1,10 +1,13 @@
 <project name="wireframing" default="default" basedir=".">
 
-  <target name="default" depends="loadprops">
+  <target name="default">
     <echo>Please specify build target!</echo>
     <echo>Available options:</echo>
+    <echo>ant init - checks out all external libraries specified.</echo>
     <echo>ant testing - builds all files to [${build.dir}] directory for overview</echo>
     <echo>ant staging - builds all files to [${dist.dir}] directory for staging and production</echo>
+    <echo>You can specify external libraries to include by passing eg. -Dwww-lib-js=prototype and/or -Dwww-lib-css=blueprint. You will need wget or curl, git and/or svn installed on your system to fetch these. Ant will try to download and compile the external libraries to [www-lib/js] and [www-lib/css] respectively.</echo>
+    <echo>[experimental!] You can load your favorite JavaScript library with Google Ajax Api by calling -Dext-lib-js=libraryname -Dext-lib-js-version=version. Ant will place the loader script into your HTML.</echo>
   </target>
 	
   <target name="loadprops">
@@ -12,7 +15,7 @@
     <echo>Load all properties</echo>
     <property file="build.properties" />
     <property file="site.properties" />
-    <property file="version.properties" />
+    <property file="extlib.properties" />
   </target>
 
   <target name="taskdefs" depends="loadprops">
@@ -26,6 +29,26 @@
     <taskdef name="cssmin" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
       <classpath refid="task.classpath" />
     </taskdef>
+  </target>
+
+  <target name="init" depends="taskdefs">
+
+    <condition property="wantsextcss">
+      <isset property="ext-css-lib" />
+    </condition>
+
+    <if>
+      <equals arg1="${wantsextjs}" arg2="true" />
+      <then>
+        <antcall target="fetch-js-lib" />
+      </then>
+    </if>
+    <if>
+      <equals arg1="${wantsextcss}" arg2="true" />
+      <then>
+        <antcall target="fetch-css-lib" />
+      </then>
+    </if>
   </target>
 
   <target name="preparedir" depends="taskdefs">
@@ -97,5 +120,25 @@
   <target name="staging" depends="testing,movetoprod">
     <echo>Building everything for staging and production to [${dist.dir}] directory</echo>
   </target>
-	
+
+
+  <target name="fetch-js-lib">
+    <echo message="Fetching ${ext-js-lib} version ${ext-js-lib-version}" />
+    <delete dir="${js.fw.src.path}" />
+    <mkdir dir="${js.fw.src.path}/${ext-lib-js}/${ext-lib-js-version}" />
+    <exec executable="wget">
+      <arg value="-P" /><arg value="${js.fw.src.path}/${ext-lib-js}/${ext-lib-js-version}" />
+      <arg value="${lib.js.base}/${ext-lib-js}/${ext-lib-js-version}/${ext-lib-js}.js" />
+    </exec>
+  </target>
+
+  <target name="fetch-css-lib">
+    <delete dir="${css.fw.src.path}" />
+    <mkdir dir="${css.fw.src.path}" />
+    <exec executable="git">
+      <arg value="clone" />
+      <arg value="${ext-css-lib}" />
+    </exec>
+  </target>
+
 </project>
