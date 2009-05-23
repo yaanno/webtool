@@ -1,0 +1,33 @@
+<project name="gitsub" default="default">
+
+  <target name="default">
+    <echo message="Building git submodules" />
+    <antcall target="submodule-init" />
+    <antcall target="submodule-update" />
+    <antcall target="submodule-build" />
+  </target>
+  
+  <target name="submodule-init">
+    <echo message="Initializing git submodules" />
+    <exec executable="git">
+      <arg value="submodule" />
+      <arg value="init" />
+    </exec>
+  </target>
+
+  <target name="submodule-update">
+    <echo message="Updating git submodules" />
+    <exec executable="git">
+      <arg value="submodule" />
+      <arg value="update" />
+    </exec>
+  </target>
+
+  <target name="submodule-build">
+    <echo message="Building module" />
+    <exec executable="rake">
+      <arg value="default" />
+    </exec>
+  </target>
+
+</project>
