@@ -5,13 +5,19 @@
   <head>
     <title>SITENAME</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link type="text/css" rel="stylesheet" href="css/prod.css?v=CURRENT_CSS_VERSION" />
+    <link type="text/css" rel="stylesheet" media="screen" href="css/PROD.CSS?v=CURRENT_CSS_VERSION" />
+    <link type="text/css" rel="stylesheet" media="print" href="css/PRINT.CSS?v=CURRENT_CSS_VERSION" />
+    
+    <!--[if IE]>
+      <link type="text/css" rel="stylesheet" media="print" href="css/IE.CSS?v=CURRENT_CSS_VERSION" />
+    <![endif]-->
+    
   </head>
   <body id="SITENAME">
     <div id="SITENAME-branding" class="panel">
       <h2 class="SITENAME panel-title"><a href="http://www.example.com">Example Site</a></h2>
       <p id="SITENAME-tagline" class="panel-content">A nice tagline</p>
     </div>
-    <script type="text/javascript" src="js/prod.js?v=CURRENT_JS_VERSION"></script>
+    <script type="text/javascript" src="js/PROD.JS?v=CURRENT_JS_VERSION"></script>
   </body>
 </html>

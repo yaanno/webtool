@@ -1,18 +1,20 @@
 <project name="wireframing" default="default" basedir=".">
 
-  <target name="default">
+  <target name="default" depends="loadprops">
     <echo>Please specify build target!</echo>
     <echo>Available options:</echo>
     <echo>ant init - checks out all external libraries specified.</echo>
-    <echo>ant testing - builds all files to [${build.dir}] directory for overview</echo>
-    <echo>ant staging - builds all files to [${dist.dir}] directory for staging and production</echo>
-    <echo>You can specify external libraries to include by passing eg. -Dwww-lib-js=prototype and/or -Dwww-lib-css=blueprint. You will need wget or curl, git and/or svn installed on your system to fetch these. Ant will try to download and compile the external libraries to [www-lib/js] and [www-lib/css] respectively.</echo>
-    <echo>[experimental!] You can load your favorite JavaScript library with Google Ajax Api by calling -Dext-lib-js=libraryname -Dext-lib-js-version=version. Ant will place the loader script into your HTML.</echo>
+    <echo>ant build-extlibs - builds external libraries specified. Initialize first!</echo>
+    <echo>ant dist-clean - cleans up working directories.</echo>
+    <echo>ant purge - cleans up everything.</echo>
+    <echo>ant testing - builds all files to [${build.dir}] directory for overview.</echo>
+    <echo>ant staging - builds all files to [${dist.dir}] directory for staging and production.</echo>
   </target>
 	
   <target name="loadprops">
     <tstamp />
     <echo>Load all properties</echo>
+    <property file="assets.properties" />
     <property file="build.properties" />
     <property file="site.properties" />
     <property file="extlib.properties" />
@@ -24,7 +26,7 @@
     <taskdef name="jsmin" classname="net.matthaynes.jsmin.JSMin_Task" classpath="${jsmin.jar}"/>
     <path id="task.classpath">
       <pathelement location="${yui.jar}" />
-	<pathelement location="${yui.task.jar}" />
+	    <pathelement location="${yui.task.jar}" />
     </path>
     <taskdef name="cssmin" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
       <classpath refid="task.classpath" />
@@ -32,51 +34,59 @@
   </target>
 
   <target name="init" depends="taskdefs">
-
-    <condition property="wantsextcss">
-      <isset property="ext-css-lib" />
-    </condition>
-
-    <if>
-      <equals arg1="${wantsextjs}" arg2="true" />
-      <then>
-        <antcall target="fetch-js-lib" />
-      </then>
-    </if>
-    <if>
-      <equals arg1="${wantsextcss}" arg2="true" />
-      <then>
-        <antcall target="fetch-css-lib" />
-      </then>
-    </if>
+    <echo message="Checking out all external libraries specified." />
+    <antcall target="fetch-js-lib" />
+    <antcall target="fetch-css-lib" />
   </target>
 
   <target name="preparedir" depends="taskdefs">
     <echo>Preparing directories and files</echo>
     <delete dir="${build.dir}" />
+    <echo>Copying source files</echo>
     <copy todir="${build.dir}">
       <fileset dir="${src.dir}" />
+    </copy>
+    <echo>Copying external CSS lib files from [${extlib.css.name}]</echo>
+    <copy todir="${build.dir}/css">
+      <filelist dir="${extlib.css.path}/${extlib.css.name}/blueprint" files="ie.css,print.css,screen.css" />
+    </copy>
+    <echo>Copying external JS lib files from [${extlib.js.name}]</echo>
+    <copy todir="${build.dir}/js">
+      <fileset dir="${extlib.js.path}/${extlib.js.name}/dist">
+        <include name="**/*.js" />
+      </fileset>
     </copy>
   </target>
 	
   <target name="concat" depends="preparedir">
     <echo>Concatenating JavaScript files</echo>
     <concat destfile="${build.dir}/js/${tmp.js}">
+      <fileset dir="${build.dir}/js" includes="prototype.js" />
       <fileset dir="${build.dir}/js" includes="master.js" />
     </concat>
     <echo>Concatenating CSS files</echo>
     <concat destfile="${build.dir}/css/${tmp.css}">
+      <fileset dir="${build.dir}/css" includes="screen.css" />
       <fileset dir="${build.dir}/css" includes="master.css" />
     </concat>
   </target>
 	
   <target name="processing" depends="concat">
     <echo>Processing all files in [${build.dir}]</echo>
-    <for param="file">
+    <echo>Processing site properties</echo>
+    <for param="step1">
       <fileset dir="${build.dir}" />
       <sequential>
-	<echo>Processing file [@{file}]</echo>
-	<replace file="@{file}" replacefilterfile="site.properties" />
+	      <echo>Setting properties in [@{step1}]</echo>
+	      <replace file="@{step1}" replacefilterfile="site.properties" />
+      </sequential>
+    </for>
+    <echo>Processing assets properties</echo>
+    <for param="step2">
+      <filelist files="${build.dir}/master.html" />
+      <sequential>
+	      <echo>Setting asset paths in [@{step2}]</echo>
+	      <replace file="@{step2}" replacefilterfile="assets.properties" />
       </sequential>
     </for>
     <echo>Setting CSS and JavaScript file versions (timestamp): ${DSTAMP}${TSTAMP}</echo>
@@ -86,14 +96,14 @@
   </target>
 	
   <target name="compress-js" depends="processing">
-    <echo>Minifying JavaScript file</echo>
+    <echo>Minifying JavaScript files</echo>
     <jsmin destdir="${build.dir}/js" force="true" suffix="true">
       <fileset dir="${build.dir}/js" includes="${tmp.js}"/>
     </jsmin>
   </target>
 	
   <target name="compress-css" depends="processing">
-    <echo>Minifying CSS file</echo>
+    <echo>Minifying CSS files</echo>
     <cssmin fromdir="${build.dir}/css" todir="${build.dir}/css" cssSuffix=".min.css">
       <include name="${tmp.css}" />
     </cssmin>
@@ -106,39 +116,59 @@
   <target name="movetoprod">
     <echo>Preparing production directories and files</echo>
     <delete dir="${dist.dir}" />
+    <echo>Copying preprocessed files</echo>
     <copy todir="${dist.dir}">
-      <fileset dir="${build.dir}" />
+      <filelist dir="${build.dir}" files="master.html" />
+    </copy>
+    <copy todir="${dist.dir}/css">
+      <filelist dir="${build.dir}/css" files="ie.css,print.css,${PROD.CSS}" />
+    </copy>
+    <copy todir="${dist.dir}/js">
+      <filelist dir="${build.dir}/js" files="${PROD.JS}" />
     </copy>
     <delete dir="${build.dir}" />
-    <delete dir="${dist.dir}">
-      <exclude name="master.html"/>
-      <exclude name="**/${prod.js}"/>
-      <exclude name="**/${prod.css}"/>
-    </delete>
   </target>
 	
   <target name="staging" depends="testing,movetoprod">
     <echo>Building everything for staging and production to [${dist.dir}] directory</echo>
   </target>
 
+  <target name="dist-clean" depends="taskdefs">
+    <echo>Cleaning up working files</echo>
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.dir}" />
+  </target>
+
+  <target name="purge" depends="dist-clean">
+    <echo>Cleaning up every external files</echo>
+    <delete dir="${extlib.dir}" />
+  </target>
 
   <target name="fetch-js-lib">
-    <echo message="Fetching ${ext-js-lib} version ${ext-js-lib-version}" />
-    <delete dir="${js.fw.src.path}" />
-    <mkdir dir="${js.fw.src.path}/${ext-lib-js}/${ext-lib-js-version}" />
-    <exec executable="wget">
-      <arg value="-P" /><arg value="${js.fw.src.path}/${ext-lib-js}/${ext-lib-js-version}" />
-      <arg value="${lib.js.base}/${ext-lib-js}/${ext-lib-js-version}/${ext-lib-js}.js" />
+    <echo>Getting external JavaScript library</echo>
+    <delete dir="${extlib.js.path}" />
+    <exec executable="git">
+      <arg value="clone" />
+      <arg value="${extlib.js.src}" />
+      <arg value="${extlib.js.path}/${extlib.js.name}" />
     </exec>
   </target>
 
   <target name="fetch-css-lib">
-    <delete dir="${css.fw.src.path}" />
-    <mkdir dir="${css.fw.src.path}" />
+    <echo>Getting external CSS library</echo>
+    <delete dir="${extlib.css.path}" />
     <exec executable="git">
       <arg value="clone" />
-      <arg value="${ext-css-lib}" />
+      <arg value="${extlib.css.src}" />
+      <arg value="${extlib.css.path}/${extlib.css.name}" />
     </exec>
   </target>
+  
+  <target name="build-extlibs" depends="taskdefs">
+    <echo>Building external libraries</echo>
+    <ant dir="${extlib.js.path}/${extlib.js.name}" antfile="${tool.dir}/www/build-git-submodules.xml" />
+  </target>
+  
+  
 
 </project>

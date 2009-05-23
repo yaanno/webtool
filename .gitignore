@@ -1,6 +1,6 @@
 # exclude stuff unnecessary
 lib/ant/*
 *~
-www-lib/css/*
-www-lib/js/*
+www-lib
 build
+dist
